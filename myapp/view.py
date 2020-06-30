@@ -6,11 +6,28 @@ Created on Mon Jun 29 02:13:35 2020
 """
 
 from myapp import app
-from flask import render_template, jsonify, Blueprint
+from flask import render_template, json, jsonify, Blueprint
 from appenv import infosetup
 #import logging
 from logger import logger
- 
+import subprocess
+import getpass
+
+#app.config["DEBUG"] = True
+#username = getpass.getuser()
+
+loglevel= logger.loggerr.level
+#lg_level =logg_level(loglevel)       
+port = app.config["PORT"]  
+dfr = infosetup.info()
+
+try:
+    process = subprocess.Popen(['git', 'rev-parse', 'HEAD'], shell=False, stdout=subprocess.PIPE)
+    git_head_hash = process.communicate()[0].strip().hex()
+except:
+    git_head_hash = "Not Available"
+    
+   
 errors = Blueprint('errors', __name__)
 
 
@@ -18,25 +35,25 @@ errors = Blueprint('errors', __name__)
 def index():
     return render_template('home.html')
 #    return '<h1>This is the Home Page.</h1>'
-       
-#@app.route('/template')
-#def template():
-#    return render_template('home.html')
 
 @app.route('/info', methods=['GET','POST'])
 def info(): 
-    logger.loggerr.info("Information page called")
-    loglevel= logger.loggerr.level
-    lg_level =logg_level(loglevel)       
-    port = app.config["PORT"]  
-    dfr = infosetup.info()
+    logger.loggerr.info("Information page called by {0} ".format(getpass.getuser()))
+    lg_level =logg_level(loglevel) 
+        
+#    port = app.config["PORT"]  
+#    dfr = infosetup.info()
     
-    
-    appinfo = {"name": dfr['name'], "version" : dfr['version'], "environment": {"service_port" : port, "log_level" : lg_level}}
+#    appinfo_dist = {}
+    try:
+        appinfo_dist = {"name": dfr['name'], "version" : dfr['version'],"git_commit_sha": git_head_hash, "environment": {"service_port" : port, "log_level" : lg_level}}
+    except:
+        logger.loggerr.error("Error While forming the data")
+        appinfo_dist = {}
    
-#    resp = json.dumps(appinfo, separators=(',', ': '), indent=2)
+    resp = json.dumps(appinfo_dist, separators=(',', ': '), indent=2)
     
-    return appinfo
+    return resp
 
 #def page_not_found(e):
 #  return render_template('404.html'), 404

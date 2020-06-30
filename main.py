@@ -8,4 +8,5 @@ Created on Mon Jun 29 02:45:31 2020
 from myapp import app
 
 if __name__ == '__main__':
+#    app.run()
     app.run(debug = app.debug)

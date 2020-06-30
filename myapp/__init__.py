@@ -6,13 +6,10 @@ Created on Mon Jun 29 01:55:05 2020
 """
 from flask import Flask
 
-
-
-#port = app.config["PORT"]
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object("environment.DevelopmentConfig")
 port = app.config["PORT"]
-app.config["DEBUG"] = True
+app.config["DEBUG"] = False
 
 server_name = "127.0.0.1:" + port
 app.config["SERVER_NAME"] = server_name
